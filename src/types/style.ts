@@ -1,0 +1,255 @@
+export type FontStyle = 'plain' | 'bold' | 'italic' | 'bolditalic';
+
+export interface DiagramStyle {
+  id: string;
+  name: string;
+  backgroundColor: string;
+  primaryColor: string;
+  secondaryColor: string;
+  tertiaryColor: string;
+  lineColor: string;
+  textColor: string;
+  noteColor: string;
+  boxColor: string;
+  boxTitleColor: string;
+  dividerColor: string;
+  fontName: string;
+  fontSize: number;
+  participantFontName: string;
+  participantFontStyle: FontStyle;
+  messageFontName: string;
+  messageFontStyle: FontStyle;
+  noteFontName: string;
+  noteFontStyle: FontStyle;
+  titleFontName: string;
+  titleFontStyle: FontStyle;
+  borderThickness: number;
+  roundCorner: number;
+  lifelineThickness: number;
+  arrowSolidThickness: number;
+  arrowDashedThickness: number;
+  diagramType: 'default' | 'sequence' | 'class' | 'component' | 'usecase' | 'activity';
+}
+
+export const DEFAULT_STYLE: DiagramStyle = {
+  id: 'default',
+  name: 'По умолчанию',
+  backgroundColor: '#FFFFFF',
+  primaryColor: '#FEFECE',
+  secondaryColor: '#FFFFDF',
+  tertiaryColor: '#FBFB77',
+  lineColor: '#A80036',
+  textColor: '#000000',
+  noteColor: '#FFFFCC',
+  boxColor: '#DDDDDD',
+  boxTitleColor: '#000000',
+  dividerColor: '#EEEEEE',
+  fontName: 'Arial',
+  fontSize: 14,
+  participantFontName: '',
+  participantFontStyle: 'plain',
+  messageFontName: '',
+  messageFontStyle: 'plain',
+  noteFontName: '',
+  noteFontStyle: 'plain',
+  titleFontName: '',
+  titleFontStyle: 'plain',
+  borderThickness: 0.5,
+  roundCorner: 5,
+  lifelineThickness: 0.5,
+  arrowSolidThickness: 1,
+  arrowDashedThickness: 1,
+  diagramType: 'default',
+};
+
+export const STYLE_PRESETS: DiagramStyle[] = [
+  {
+    ...DEFAULT_STYLE,
+    id: 'default',
+    name: 'Classic',
+  },
+  {
+    ...DEFAULT_STYLE,
+    id: 'dark',
+    name: 'Dark',
+    backgroundColor: '#1e1e2e',
+    primaryColor: '#313244',
+    secondaryColor: '#45475a',
+    tertiaryColor: '#585b70',
+    lineColor: '#89b4fa',
+    textColor: '#cdd6f4',
+    noteColor: '#313244',
+    boxColor: '#2a2a3e',
+    boxTitleColor: '#cdd6f4',
+    dividerColor: '#45475a',
+  },
+  {
+    ...DEFAULT_STYLE,
+    id: 'pastel',
+    name: 'Pastel',
+    backgroundColor: '#fdf6e3',
+    primaryColor: '#eee8d5',
+    secondaryColor: '#fdf6e3',
+    tertiaryColor: '#e8d5b7',
+    lineColor: '#657b83',
+    textColor: '#657b83',
+    noteColor: '#fff9c4',
+    boxColor: '#e8e0cc',
+    boxTitleColor: '#657b83',
+    dividerColor: '#ddd5bc',
+    fontName: 'Georgia',
+    fontSize: 13,
+    roundCorner: 8,
+    noteFontName: 'Georgia',
+    noteFontStyle: 'italic',
+    titleFontName: 'Georgia',
+    titleFontStyle: 'italic',
+  },
+  {
+    ...DEFAULT_STYLE,
+    id: 'blueprint',
+    name: 'Blueprint',
+    backgroundColor: '#0d2137',
+    primaryColor: '#0a3a5c',
+    secondaryColor: '#0a4a7a',
+    tertiaryColor: '#0a5a9c',
+    lineColor: '#5dade2',
+    textColor: '#aed6f1',
+    noteColor: '#0a3a5c',
+    boxColor: '#0a2a4a',
+    boxTitleColor: '#5dade2',
+    dividerColor: '#0a3a5c',
+    fontName: 'Courier',
+    fontSize: 13,
+    participantFontName: 'Courier',
+    participantFontStyle: 'bold',
+    messageFontName: 'Courier',
+    titleFontName: 'Courier',
+    borderThickness: 2,
+    roundCorner: 0,
+    lifelineThickness: 2,
+    arrowSolidThickness: 2,
+    arrowDashedThickness: 1.5,
+  },
+  {
+    ...DEFAULT_STYLE,
+    id: 'sketch',
+    name: 'Sketch',
+    lineColor: '#333333',
+    textColor: '#333333',
+    noteColor: '#fffde7',
+    boxColor: '#f5f5f5',
+    boxTitleColor: '#333333',
+    dividerColor: '#e0e0e0',
+    fontName: 'Comic Sans MS',
+    roundCorner: 3,
+  },
+  {
+    ...DEFAULT_STYLE,
+    id: 'nord',
+    name: 'Nord',
+    backgroundColor: '#2e3440',
+    primaryColor: '#3b4252',
+    secondaryColor: '#434c5e',
+    tertiaryColor: '#4c566a',
+    lineColor: '#88c0d0',
+    textColor: '#eceff4',
+    noteColor: '#3b4252',
+    boxColor: '#3b4252',
+    boxTitleColor: '#88c0d0',
+    dividerColor: '#434c5e',
+  },
+  {
+    ...DEFAULT_STYLE,
+    id: 'monokai',
+    name: 'Monokai',
+    backgroundColor: '#272822',
+    primaryColor: '#3e3d32',
+    secondaryColor: '#49483e',
+    tertiaryColor: '#75715e',
+    lineColor: '#a6e22e',
+    textColor: '#f8f8f2',
+    noteColor: '#3e3d32',
+    boxColor: '#3e3d32',
+    boxTitleColor: '#e6db74',
+    dividerColor: '#49483e',
+  },
+  {
+    ...DEFAULT_STYLE,
+    id: 'minimal',
+    name: 'Minimal',
+    backgroundColor: '#ffffff',
+    primaryColor: '#ffffff',
+    secondaryColor: '#f5f5f5',
+    tertiaryColor: '#eeeeee',
+    lineColor: '#000000',
+    textColor: '#000000',
+    noteColor: '#f5f5f5',
+    boxColor: '#f5f5f5',
+    boxTitleColor: '#000000',
+    dividerColor: '#e0e0e0',
+    roundCorner: 0,
+    borderThickness: 1.5,
+  },
+  {
+    ...DEFAULT_STYLE,
+    id: 'forest',
+    name: 'Forest',
+    backgroundColor: '#1a2f1a',
+    primaryColor: '#2d4a2d',
+    secondaryColor: '#3a5e3a',
+    tertiaryColor: '#4a7a4a',
+    lineColor: '#7ec87e',
+    textColor: '#d4f0d4',
+    noteColor: '#2d4a2d',
+    boxColor: '#253e25',
+    boxTitleColor: '#7ec87e',
+    dividerColor: '#3a5e3a',
+  },
+  {
+    ...DEFAULT_STYLE,
+    id: 'rose',
+    name: 'Rose',
+    backgroundColor: '#fff5f5',
+    primaryColor: '#ffe4e6',
+    secondaryColor: '#fecdd3',
+    tertiaryColor: '#fda4af',
+    lineColor: '#e11d48',
+    textColor: '#881337',
+    noteColor: '#fff1f2',
+    boxColor: '#ffe4e6',
+    boxTitleColor: '#be123c',
+    dividerColor: '#fecdd3',
+    roundCorner: 10,
+  },
+  {
+    ...DEFAULT_STYLE,
+    id: 'ocean',
+    name: 'Ocean',
+    backgroundColor: '#0c1821',
+    primaryColor: '#1b2a3b',
+    secondaryColor: '#243447',
+    tertiaryColor: '#2e4057',
+    lineColor: '#00b4d8',
+    textColor: '#caf0f8',
+    noteColor: '#1b2a3b',
+    boxColor: '#162130',
+    boxTitleColor: '#00b4d8',
+    dividerColor: '#243447',
+  },
+  {
+    ...DEFAULT_STYLE,
+    id: 'sunset',
+    name: 'Sunset',
+    backgroundColor: '#1a0a00',
+    primaryColor: '#2d1600',
+    secondaryColor: '#4a2500',
+    tertiaryColor: '#6b3800',
+    lineColor: '#ff8c42',
+    textColor: '#ffe8cc',
+    noteColor: '#2d1600',
+    boxColor: '#2a1400',
+    boxTitleColor: '#ff8c42',
+    dividerColor: '#4a2500',
+  },
+];
