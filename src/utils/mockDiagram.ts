@@ -12,12 +12,12 @@ queue       "Queue"       as queue
 participant "Participant" as part
 
 ' ── Боксы (группировка участников) ──────────────────────────
-box "Frontend" #LightBlue
+box "Frontend"
   participant "Browser" as browser
   participant "UI Layer" as ui
 end box
 
-box "Backend" #LightYellow
+box "Backend"
   participant "API"     as api
   participant "Worker"  as worker
 end box
@@ -51,7 +51,7 @@ actor -> api : Запрос
 activate api
 
 api -> worker : Делегирование
-activate worker #salmon
+activate worker
 
 worker --> api : Результат
 deactivate worker

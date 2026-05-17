@@ -4,9 +4,13 @@ import type { DiagramStyle } from '../types/style';
 
 const PLANTUML_SERVER = 'https://www.plantuml.com/plantuml';
 
-/** Emit a skinparam line only when the value is a non-empty string */
+const HEX_RE = /^#[0-9a-f]{6}$/i;
+
+/** Emit a skinparam line only for valid, complete hex colors — always lowercase */
 function color(name: string, value: string, indent = '  '): string {
-  return value?.trim() ? `${indent}${name} ${value.trim()}` : '';
+  const v = value?.trim();
+  if (!v || !HEX_RE.test(v)) return '';
+  return `${indent}${name} ${v.toLowerCase()}`;
 }
 
 function buildSkinparams(style: DiagramStyle): string {
@@ -21,7 +25,6 @@ function buildSkinparams(style: DiagramStyle): string {
   rawLines.push('skinparam {');
   rawLines.push(color('BackgroundColor', style.backgroundColor));
   rawLines.push(color('ArrowColor', style.lineColor));
-  rawLines.push(color('BorderColor', style.lineColor));
   if (style.roundCorner != null) rawLines.push(`  RoundCorner ${style.roundCorner}`);
 
   // Participants / entities
@@ -30,9 +33,11 @@ function buildSkinparams(style: DiagramStyle): string {
     'Entity', 'Database', 'Collections', 'Queue',
     'Class', 'Component', 'Usecase', 'Node', 'Object',
   ];
+  const entityBorder = style.entityBorderColor || style.lineColor;
   entityTypes.forEach((t) => {
     rawLines.push(color(`${t}BackgroundColor`, style.primaryColor));
-    rawLines.push(color(`${t}BorderColor`, style.lineColor));
+    rawLines.push(color(`${t}BorderColor`, entityBorder));
+    rawLines.push(color(`${t}FontColor`, style.participantTextColor));
   });
 
   // Notes
@@ -42,14 +47,18 @@ function buildSkinparams(style: DiagramStyle): string {
   // Sequence lifelines
   rawLines.push(color('SequenceLifeLineBorderColor', style.lineColor));
 
-  // Groups (alt / opt / loop / par …)
+  // Groups (alt / opt / loop / par …) + Ref (same palette)
   rawLines.push(color('SequenceGroupBackgroundColor', style.tertiaryColor));
   rawLines.push(color('SequenceGroupBorderColor', style.lineColor));
+  rawLines.push(color('SequenceReferenceBackgroundColor', style.backgroundColor));
+  rawLines.push(color('SequenceReferenceHeaderBackgroundColor', style.tertiaryColor));
+  rawLines.push(color('SequenceReferenceBorderColor', style.lineColor));
+  rawLines.push(color('SequenceReferenceFontColor', style.textColor));
 
   // Boxes (box … end box participant grouping)
   rawLines.push(color('SequenceBoxBackgroundColor', style.boxColor));
-  rawLines.push(color('SequenceBoxBorderColor', style.lineColor));
-  rawLines.push(color('BoxFontColor', style.boxTitleColor));
+  rawLines.push(color('SequenceBoxBorderColor', style.boxBorderColor || style.lineColor));
+  rawLines.push(color('SequenceBoxFontColor', style.boxTitleColor));
 
   // Dividers (== text ==)
   rawLines.push(color('SequenceDividerBackgroundColor', style.dividerColor));
@@ -60,38 +69,41 @@ function buildSkinparams(style: DiagramStyle): string {
   const participantTypes = ['Actor', 'Participant', 'Boundary', 'Control', 'Entity', 'Database', 'Collections', 'Queue'];
   participantTypes.forEach((t) => {
     if (style.participantFontName) rawLines.push(`  ${t}FontName ${style.participantFontName}`);
-    if (style.participantFontStyle) rawLines.push(`  ${t}FontStyle ${style.participantFontStyle}`);
   });
   if (style.messageFontName) rawLines.push(`  SequenceMessageFontName ${style.messageFontName}`);
-  if (style.messageFontStyle) rawLines.push(`  SequenceMessageFontStyle ${style.messageFontStyle}`);
   if (style.noteFontName) rawLines.push(`  NoteFontName ${style.noteFontName}`);
-  if (style.noteFontStyle) rawLines.push(`  NoteFontStyle ${style.noteFontStyle}`);
   if (style.titleFontName) rawLines.push(`  TitleFontName ${style.titleFontName}`);
-  if (style.titleFontStyle) rawLines.push(`  TitleFontStyle ${style.titleFontStyle}`);
   if (style.titleFontName) rawLines.push(`  SequenceBoxFontName ${style.titleFontName}`);
-  if (style.titleFontStyle) rawLines.push(`  SequenceBoxFontStyle ${style.titleFontStyle}`);
   if (style.titleFontName) rawLines.push(`  SequenceDividerFontName ${style.titleFontName}`);
-  if (style.titleFontStyle) rawLines.push(`  SequenceDividerFontStyle ${style.titleFontStyle}`);
   rawLines.push('}');
 
   // Drop empty lines produced by color() when value was blank
   return rawLines.filter((l) => l !== '').join('\n');
 }
 
+function buildStyleBlock(style: DiagramStyle): string {
+  const lines: string[] = ['<style>'];
+  lines.push(`lifeLine { LineThickness ${style.lifelineThickness} }`);
+  lines.push('</style>');
+  return lines.join('\n');
+}
+
 export function injectStyle(umlSource: string, style: DiagramStyle): string {
   const skinparams = buildSkinparams(style);
+  const styleBlock = buildStyleBlock(style);
+  const injection = styleBlock + '\n' + skinparams;
 
   const startIdx = umlSource.toLowerCase().indexOf('@start');
   if (startIdx === -1) {
-    return `@startuml\n${skinparams}\n${umlSource}\n@enduml`;
+    return `@startuml\n${injection}\n${umlSource}\n@enduml`;
   }
 
   const newlineIdx = umlSource.indexOf('\n', startIdx);
   if (newlineIdx === -1) {
-    return umlSource + '\n' + skinparams;
+    return umlSource + '\n' + injection;
   }
 
-  return umlSource.slice(0, newlineIdx + 1) + skinparams + '\n' + umlSource.slice(newlineIdx + 1);
+  return umlSource.slice(0, newlineIdx + 1) + injection + '\n' + umlSource.slice(newlineIdx + 1);
 }
 
 export function encodeUml(umlSource: string): string {

@@ -10,9 +10,10 @@ import { useStyles } from './hooks/useStyles';
 import { useCustomFont } from './hooks/useCustomFont';
 import { useActorIcon } from './hooks/useActorIcon';
 import { useTheme } from './hooks/useTheme';
-import { injectFontIntoSvg } from './utils/svgFont';
+import { injectFontIntoSvg, injectSystemFontsIntoSvg } from './utils/svgFont';
 import { injectActorIconIntoSvg } from './utils/svgActorIcon';
 import { applyThicknessToSvg } from './utils/svgThickness';
+import { useSystemFonts } from './hooks/useSystemFonts';
 import { buildShareUrl, parseShareUrl } from './utils/shareUrl';
 import { hasCuts, splitDiagramSource } from './utils/splitDiagram';
 
@@ -27,6 +28,7 @@ export default function App() {
   const { activeStyle, allStyles, setActiveStyle, saveStyle, deleteStyle, renameStyle, updateActiveStyle, restorePresets } = useStyles();
   const { customFont, loadFontFile, removeCustomFont } = useCustomFont();
   const { actorIcon, loadIconFile, removeActorIcon } = useActorIcon();
+  const systemFonts = useSystemFonts();
   const { isDark, toggleTheme } = useTheme();
   const [editorWidth, setEditorWidth] = useState(320);
   const [showEditor, setShowEditor] = useState(true);
@@ -125,6 +127,7 @@ export default function App() {
 
   const postProcess = useCallback((svg: string) => {
     let s = svg;
+    s = injectSystemFontsIntoSvg(s, systemFonts);
     if (customFont) s = injectFontIntoSvg(s, customFont);
     if (actorIcon) s = injectActorIconIntoSvg(s, actorIcon);
     s = applyThicknessToSvg(
@@ -135,7 +138,7 @@ export default function App() {
       activeStyle.borderThickness,
     );
     return s;
-  }, [customFont, actorIcon, activeStyle.lifelineThickness, activeStyle.arrowSolidThickness, activeStyle.arrowDashedThickness, activeStyle.borderThickness]);
+  }, [systemFonts, customFont, actorIcon, activeStyle.lifelineThickness, activeStyle.arrowSolidThickness, activeStyle.arrowDashedThickness, activeStyle.borderThickness]);
 
   const displaySvg = useMemo(
     () => (svgContent ? postProcess(svgContent) : ''),

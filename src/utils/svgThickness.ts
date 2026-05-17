@@ -6,7 +6,6 @@ export function applyThicknessToSvg(
   borderThickness: number,
 ): string {
   const isDefault =
-    lifelineThickness === 0.5 &&
     arrowSolidThickness === 1 &&
     arrowDashedThickness === 1 &&
     borderThickness === 0.5;
@@ -20,9 +19,6 @@ export function applyThicknessToSvg(
     .flatMap((cls) => shapes.map((s) => `.${cls} > ${s}`))
     .join(',');
   css.push(`${borderSelectors}{stroke-width:${borderThickness} !important}`);
-
-  // ── Lifelines ─────────────────────────────────────────────
-  css.push(`.participant-lifeline > line{stroke-width:${lifelineThickness} !important}`);
 
   // ── Message arrows ────────────────────────────────────────
   // Use DOMParser only for classification (read-only) — no XMLSerializer needed

@@ -1,5 +1,6 @@
-import { useState, useRef, useEffect, type ReactNode } from 'react';
-import type { DiagramStyle, FontStyle } from '../types/style';
+import { useState, useRef, useEffect, useCallback, type ReactNode } from 'react';
+import type { DiagramStyle } from '../types/style';
+import { DEFAULT_STYLE } from '../types/style';
 import type { CustomFont } from '../types/font';
 import type { CustomIcon } from '../types/icon';
 import { SNIPPET_GROUPS } from '../data/snippets';
@@ -22,7 +23,7 @@ interface Props {
   onRestorePresets: () => void;
 }
 
-const FONT_SUGGESTIONS = ['Arial', 'Courier', 'Georgia', 'Helvetica', 'Times New Roman', 'Verdana', 'Comic Sans MS'];
+const SYSTEM_FONTS = ['CoFo Redmadrobot Regular', 'CoFo Sans Regular'];
 
 function FontSelect({ value, customFont, onChange, includeEmpty = false }: {
   value: string;
@@ -37,52 +38,24 @@ function FontSelect({ value, customFont, onChange, includeEmpty = false }: {
       className="flex-1 min-w-0 text-xs bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded px-1.5 py-1 text-gray-700 dark:text-gray-200 outline-none focus:border-indigo-400"
     >
       {includeEmpty && <option value="">(по умолчанию)</option>}
-      {FONT_SUGGESTIONS.map((f) => <option key={f} value={f}>{f}</option>)}
+      {SYSTEM_FONTS.map((f) => <option key={f} value={f}>{f}</option>)}
       {customFont && <option value={customFont.name}>{customFont.name}</option>}
     </select>
   );
 }
 
-const FONT_STYLE_OPTIONS: { value: FontStyle; label: string }[] = [
-  { value: 'plain',      label: 'Aa' },
-  { value: 'bold',       label: 'B' },
-  { value: 'italic',     label: 'I' },
-  { value: 'bolditalic', label: 'BI' },
-];
-
 function FontRow({
-  label, fontName, fontStyle, customFont,
-  onFontName, onFontStyle,
+  label, fontName, customFont, onFontName,
 }: {
   label: string;
   fontName: string;
-  fontStyle: FontStyle;
   customFont: CustomFont | null;
   onFontName: (v: string) => void;
-  onFontStyle: (v: FontStyle) => void;
 }) {
   return (
     <div className="space-y-1">
       <p className="text-xs text-gray-400 dark:text-gray-500">{label}</p>
-      <div className="flex gap-1.5">
-        <FontSelect value={fontName} customFont={customFont} onChange={onFontName} includeEmpty />
-        <div className="flex rounded overflow-hidden border border-gray-300 dark:border-gray-600 shrink-0">
-          {FONT_STYLE_OPTIONS.map((opt) => (
-            <button
-              key={opt.value}
-              onClick={() => onFontStyle(opt.value)}
-              title={opt.value}
-              className={`px-1.5 py-0.5 text-xs transition-colors ${
-                fontStyle === opt.value
-                  ? 'bg-indigo-600 text-white'
-                  : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-gray-800 dark:hover:text-gray-200'
-              } ${opt.value === 'bold' || opt.value === 'bolditalic' ? 'font-bold' : ''} ${opt.value === 'italic' || opt.value === 'bolditalic' ? 'italic' : ''}`}
-            >
-              {opt.label}
-            </button>
-          ))}
-        </div>
-      </div>
+      <FontSelect value={fontName} customFont={customFont} onChange={onFontName} includeEmpty />
     </div>
   );
 }
@@ -110,29 +83,49 @@ function CollapsibleSection({ title, children }: { title: string; children: Reac
   );
 }
 
-function ColorField({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
+function ColorField({ label, value, onChange, optional }: { label: string; value: string; onChange: (v: string) => void; optional?: boolean }) {
+  const isEmpty = optional && !value;
   return (
     <div className="flex items-center justify-between gap-2">
       <label className="text-xs text-gray-500 dark:text-gray-400 truncate flex-1">{label}</label>
       <div className="flex items-center gap-1.5">
-        <input
-          type="color"
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className="w-7 h-7 rounded cursor-pointer border border-gray-300 dark:border-gray-600 bg-transparent"
-        />
-        <input
-          type="text"
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className="w-20 text-xs bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded px-1.5 py-1 text-gray-700 dark:text-gray-200 font-mono"
-        />
+        {isEmpty ? (
+          <>
+            <span className="text-xs text-gray-400 dark:text-gray-500 italic">не задан</span>
+            <button
+              onClick={() => onChange('#000000')}
+              className="text-xs px-1.5 py-0.5 rounded bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-500 dark:text-gray-400"
+            >+</button>
+          </>
+        ) : (
+          <>
+            <input
+              type="color"
+              value={value || '#000000'}
+              onChange={(e) => onChange(e.target.value)}
+              className="w-7 h-7 rounded cursor-pointer border border-gray-300 dark:border-gray-600 bg-transparent"
+            />
+            <input
+              type="text"
+              value={value}
+              onChange={(e) => onChange(e.target.value)}
+              className="w-20 text-xs bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded px-1.5 py-1 text-gray-700 dark:text-gray-200 font-mono"
+            />
+            {optional && (
+              <button
+                onClick={() => onChange('')}
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-xs leading-none"
+                title="Сбросить"
+              >×</button>
+            )}
+          </>
+        )}
       </div>
     </div>
   );
 }
 
-const BUILT_IN_IDS = new Set(['default', 'dark', 'pastel', 'blueprint', 'sketch', 'nord', 'monokai', 'minimal', 'forest', 'rose', 'ocean', 'sunset']);
+const BUILT_IN_IDS = new Set(['default', 'rmr-1', 'rmr-2', 'rmr-3', 'rmr-4']);
 
 export function StylePanel({
   activeStyle, allStyles, customFont, actorIcon,
@@ -169,6 +162,26 @@ export function StylePanel({
     setSaveName('');
     setShowSaveForm(false);
   };
+
+  const [codeCopied, setCodeCopied] = useState(false);
+  const handleCopyCode = useCallback(() => {
+    const defaults = DEFAULT_STYLE as Record<string, unknown>;
+    const current = activeStyle as Record<string, unknown>;
+    const skipKeys = new Set(['id', 'name', 'participantFontStyle', 'messageFontStyle', 'noteFontStyle', 'titleFontStyle']);
+    const overrides = (Object.keys(current) as string[])
+      .filter((k) => !skipKeys.has(k) && JSON.stringify(current[k]) !== JSON.stringify(defaults[k]))
+      .map((k) => {
+        const v = current[k];
+        const val = typeof v === 'string' ? `'${v}'` : String(v);
+        return `    ${k}: ${val},`;
+      })
+      .join('\n');
+    const snippet = `  {\n    ...DEFAULT_STYLE,\n    id: '${current.id}',\n    name: '${current.name}',\n${overrides}\n  },`;
+    navigator.clipboard.writeText(snippet).then(() => {
+      setCodeCopied(true);
+      setTimeout(() => setCodeCopied(false), 2000);
+    });
+  }, [activeStyle]);
 
   const handleFontFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -298,11 +311,14 @@ export function StylePanel({
                 <ColorField label="Сущности (фон)" value={activeStyle.primaryColor} onChange={(v) => onUpdate({ primaryColor: v })} />
                 <ColorField label="Примечания (фон)" value={activeStyle.noteColor} onChange={(v) => onUpdate({ noteColor: v })} />
                 <ColorField label="Боксы (фон)" value={activeStyle.boxColor} onChange={(v) => onUpdate({ boxColor: v })} />
-                <ColorField label="Боксы (заголовок)" value={activeStyle.boxTitleColor} onChange={(v) => onUpdate({ boxTitleColor: v })} />
+                <ColorField label="Боксы (текст)" value={activeStyle.boxTitleColor} onChange={(v) => onUpdate({ boxTitleColor: v })} />
+                <ColorField label="Боксы (контур)" value={activeStyle.boxBorderColor} onChange={(v) => onUpdate({ boxBorderColor: v })} optional />
                 <ColorField label="Разделитель (фон)" value={activeStyle.dividerColor} onChange={(v) => onUpdate({ dividerColor: v })} />
                 <ColorField label="Группы alt/opt/loop" value={activeStyle.tertiaryColor} onChange={(v) => onUpdate({ tertiaryColor: v })} />
                 <ColorField label="Стрелки и линии" value={activeStyle.lineColor} onChange={(v) => onUpdate({ lineColor: v })} />
+                <ColorField label="Рамки сущностей" value={activeStyle.entityBorderColor} onChange={(v) => onUpdate({ entityBorderColor: v })} optional />
                 <ColorField label="Текст" value={activeStyle.textColor} onChange={(v) => onUpdate({ textColor: v })} />
+                <ColorField label="Текст сущностей" value={activeStyle.participantTextColor} onChange={(v) => onUpdate({ participantTextColor: v })} optional />
               </div>
             </CollapsibleSection>
 
@@ -371,34 +387,26 @@ export function StylePanel({
                   <FontRow
                     label="Сущности"
                     fontName={activeStyle.participantFontName}
-                    fontStyle={activeStyle.participantFontStyle}
                     customFont={customFont}
                     onFontName={(v) => onUpdate({ participantFontName: v })}
-                    onFontStyle={(v) => onUpdate({ participantFontStyle: v })}
                   />
                   <FontRow
                     label="Сообщения"
                     fontName={activeStyle.messageFontName}
-                    fontStyle={activeStyle.messageFontStyle}
                     customFont={customFont}
                     onFontName={(v) => onUpdate({ messageFontName: v })}
-                    onFontStyle={(v) => onUpdate({ messageFontStyle: v })}
                   />
                   <FontRow
                     label="Примечания"
                     fontName={activeStyle.noteFontName}
-                    fontStyle={activeStyle.noteFontStyle}
                     customFont={customFont}
                     onFontName={(v) => onUpdate({ noteFontName: v })}
-                    onFontStyle={(v) => onUpdate({ noteFontStyle: v })}
                   />
                   <FontRow
                     label="Заголовок / боксы"
                     fontName={activeStyle.titleFontName}
-                    fontStyle={activeStyle.titleFontStyle}
                     customFont={customFont}
                     onFontName={(v) => onUpdate({ titleFontName: v })}
-                    onFontStyle={(v) => onUpdate({ titleFontStyle: v })}
                   />
                 </div>
               </div>
@@ -494,14 +502,31 @@ export function StylePanel({
               </div>
             </CollapsibleSection>
 
+            {/* DEV: copy preset as TS code */}
+            <section className="pt-2 border-t border-dashed border-yellow-400 dark:border-yellow-600">
+              <button
+                onClick={handleCopyCode}
+                className="w-full py-1 text-xs rounded border border-yellow-400 dark:border-yellow-600 text-yellow-600 dark:text-yellow-400 hover:bg-yellow-50 dark:hover:bg-yellow-900/20 transition-colors font-mono"
+              >
+                {codeCopied ? '✓ Скопировано в буфер' : '{ } Скопировать код пресета'}
+              </button>
+            </section>
+
             {/* Save */}
-            <section className="pt-2 border-t border-gray-200 dark:border-gray-700">
+            <section className="pt-2 border-t border-gray-200 dark:border-gray-700 space-y-2">
+              <button
+                onClick={() => onSave(activeStyle)}
+                className="w-full py-1.5 text-xs rounded bg-indigo-700 hover:bg-indigo-600 text-white font-medium transition-colors truncate"
+                title={`Сохранить изменения в «${activeStyle.name}»`}
+              >
+                Обновить «{activeStyle.name}»
+              </button>
               {!showSaveForm ? (
                 <button
-                  onClick={() => setShowSaveForm(true)}
-                  className="w-full py-1.5 text-xs rounded bg-indigo-700 hover:bg-indigo-600 text-white font-medium transition-colors"
+                  onClick={() => { setShowSaveForm(true); setSaveName(''); }}
+                  className="w-full py-1.5 text-xs rounded bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 font-medium transition-colors"
                 >
-                  Сохранить как пресет
+                  Сохранить как новый…
                 </button>
               ) : (
                 <div className="space-y-2">
@@ -516,7 +541,7 @@ export function StylePanel({
                   />
                   <div className="flex gap-2">
                     <button onClick={handleSave} disabled={!saveName.trim()} className="flex-1 py-1 text-xs rounded bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white transition-colors">
-                      Сохранить
+                      Создать
                     </button>
                     <button onClick={() => { setShowSaveForm(false); setSaveName(''); }} className="flex-1 py-1 text-xs rounded bg-gray-200 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 transition-colors">
                       Отмена
