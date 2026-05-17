@@ -19,7 +19,6 @@ export function extractFontName(buffer: ArrayBuffer): string | null {
     const MAGIC_WOFF = 0x774F4646; // 'wOFF'
 
     let nameTableOffset = -1;
-    let __nameTableLength = -1;
     let isUncompressed = true;
 
     if (magic === MAGIC_TTF || magic === MAGIC_OTF || magic === MAGIC_TRUE) {
@@ -30,7 +29,6 @@ export function extractFontName(buffer: ArrayBuffer): string | null {
         const tag = readTag(view, dir);
         if (tag === 'name') {
           nameTableOffset = view.getUint32(dir + 8);
-          _nameTableLength = view.getUint32(dir + 12);
           break;
         }
       }
@@ -44,7 +42,6 @@ export function extractFontName(buffer: ArrayBuffer): string | null {
           nameTableOffset = view.getUint32(dir + 4);
           const compLength = view.getUint32(dir + 8);
           const origLength = view.getUint32(dir + 12);
-          _nameTableLength = compLength;
           isUncompressed = compLength === origLength;
           break;
         }
