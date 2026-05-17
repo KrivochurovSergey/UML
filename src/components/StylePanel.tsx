@@ -1,6 +1,5 @@
-import { useState, useRef, useEffect, useCallback, type ReactNode } from 'react';
+import { useState, useRef, useEffect, type ReactNode } from 'react';
 import type { DiagramStyle } from '../types/style';
-import { DEFAULT_STYLE } from '../types/style';
 import type { CustomFont } from '../types/font';
 import type { CustomIcon } from '../types/icon';
 import { SNIPPET_GROUPS } from '../data/snippets';

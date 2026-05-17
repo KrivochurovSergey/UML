@@ -1,6 +1,6 @@
 export function applyThicknessToSvg(
   svgContent: string,
-  lifelineThickness: number,
+  _lifelineThickness: number,
   arrowSolidThickness: number,
   arrowDashedThickness: number,
   borderThickness: number,
