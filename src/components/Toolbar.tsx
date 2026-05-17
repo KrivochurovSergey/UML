@@ -1,4 +1,3 @@
-import { useState, useCallback } from 'react';
 import { downloadSvg, downloadPng, downloadSvgParts, downloadPngParts } from '../utils/export';
 
 interface Props {
@@ -7,21 +6,11 @@ interface Props {
   loading: boolean;
   isDark: boolean;
   onToggleTheme: () => void;
-  onGetShareUrl: () => string;
 }
 
-export function Toolbar({ svgContent, svgParts, loading, isDark, onToggleTheme, onGetShareUrl }: Props) {
+export function Toolbar({ svgContent, svgParts, loading, isDark, onToggleTheme }: Props) {
   const isMulti = svgParts.length > 1;
   const canExport = (isMulti ? svgParts.length > 0 : !!svgContent) && !loading;
-  const [copied, setCopied] = useState(false);
-
-  const handleShare = useCallback(() => {
-    const url = onGetShareUrl();
-    navigator.clipboard.writeText(url).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    });
-  }, [onGetShareUrl]);
 
   const handleSvg = () => {
     if (!canExport) return;
@@ -61,14 +50,6 @@ export function Toolbar({ svgContent, svgParts, loading, isDark, onToggleTheme, 
             <path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
           </svg>
         )}
-      </button>
-
-      <button
-        onClick={handleShare}
-        className="px-3 py-1.5 text-xs font-medium rounded bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-100 transition-colors min-w-[90px]"
-        title="Скопировать ссылку на диаграмму"
-      >
-        {copied ? '✓ Скопировано' : '⤴ Поделиться'}
       </button>
 
       <button

@@ -163,25 +163,6 @@ export function StylePanel({
     setShowSaveForm(false);
   };
 
-  const [codeCopied, setCodeCopied] = useState(false);
-  const handleCopyCode = useCallback(() => {
-    const defaults = DEFAULT_STYLE as Record<string, unknown>;
-    const current = activeStyle as Record<string, unknown>;
-    const skipKeys = new Set(['id', 'name', 'participantFontStyle', 'messageFontStyle', 'noteFontStyle', 'titleFontStyle']);
-    const overrides = (Object.keys(current) as string[])
-      .filter((k) => !skipKeys.has(k) && JSON.stringify(current[k]) !== JSON.stringify(defaults[k]))
-      .map((k) => {
-        const v = current[k];
-        const val = typeof v === 'string' ? `'${v}'` : String(v);
-        return `    ${k}: ${val},`;
-      })
-      .join('\n');
-    const snippet = `  {\n    ...DEFAULT_STYLE,\n    id: '${current.id}',\n    name: '${current.name}',\n${overrides}\n  },`;
-    navigator.clipboard.writeText(snippet).then(() => {
-      setCodeCopied(true);
-      setTimeout(() => setCodeCopied(false), 2000);
-    });
-  }, [activeStyle]);
 
   const handleFontFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -502,15 +483,6 @@ export function StylePanel({
               </div>
             </CollapsibleSection>
 
-            {/* DEV: copy preset as TS code */}
-            <section className="pt-2 border-t border-dashed border-yellow-400 dark:border-yellow-600">
-              <button
-                onClick={handleCopyCode}
-                className="w-full py-1 text-xs rounded border border-yellow-400 dark:border-yellow-600 text-yellow-600 dark:text-yellow-400 hover:bg-yellow-50 dark:hover:bg-yellow-900/20 transition-colors font-mono"
-              >
-                {codeCopied ? '✓ Скопировано в буфер' : '{ } Скопировать код пресета'}
-              </button>
-            </section>
 
             {/* Save */}
             <section className="pt-2 border-t border-gray-200 dark:border-gray-700 space-y-2">

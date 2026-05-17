@@ -14,7 +14,7 @@ import { injectFontIntoSvg, injectSystemFontsIntoSvg } from './utils/svgFont';
 import { injectActorIconIntoSvg } from './utils/svgActorIcon';
 import { applyThicknessToSvg } from './utils/svgThickness';
 import { useSystemFonts } from './hooks/useSystemFonts';
-import { buildShareUrl, parseShareUrl } from './utils/shareUrl';
+import { parseShareUrl } from './utils/shareUrl';
 import { hasCuts, splitDiagramSource } from './utils/splitDiagram';
 
 const DEBOUNCE_MS = 800;
@@ -121,9 +121,6 @@ export default function App() {
     updateActiveStyle(patch);
   }, [removeCustomFont, updateActiveStyle, customFont, activeStyle]);
 
-  const handleShareUrl = useCallback(() => {
-    return buildShareUrl(activeTab.source, activeStyle);
-  }, [activeTab.source, activeStyle]);
 
   const postProcess = useCallback((svg: string) => {
     let s = svg;
@@ -158,7 +155,6 @@ export default function App() {
         loading={loading}
         isDark={isDark}
         onToggleTheme={toggleTheme}
-        onGetShareUrl={handleShareUrl}
       />
 
       <TabBar
