@@ -16,8 +16,19 @@ export function useDiagram() {
     try {
       const styled = injectStyle(umlSource, style);
       const encoded = encodeUml(styled);
-      const svg = await fetchSvg(encoded);
-      setSvgContent(svg);
+      let svg: string | null = null;
+      let lastErr: unknown;
+      for (let attempt = 0; attempt < 3; attempt++) {
+        try {
+          svg = await fetchSvg(encoded);
+          break;
+        } catch (err) {
+          lastErr = err;
+          if (attempt < 2) await new Promise((r) => setTimeout(r, 800));
+        }
+      }
+      if (svg != null) setSvgContent(svg);
+      else throw lastErr;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Ошибка рендеринга');
     } finally {
