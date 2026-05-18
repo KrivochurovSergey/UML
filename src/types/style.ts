@@ -112,6 +112,7 @@ export const STYLE_PRESETS: DiagramStyle[] = [
     noteColor: '#d0dbd7',
     boxColor: '#d6d6d6',
     dividerColor: '#ffffff',
+    fontName: 'CoFo Redmadrobot Regular',
     fontSize: 12,
     borderThickness: 1.5,
     roundCorner: 2,
