@@ -63,11 +63,6 @@ export const DEFAULT_STYLE: DiagramStyle = {
 export const STYLE_PRESETS: DiagramStyle[] = [
   {
     ...DEFAULT_STYLE,
-    id: 'default',
-    name: 'Classic',
-  },
-  {
-    ...DEFAULT_STYLE,
     id: 'rmr-1',
     name: 'RedMadRobot_1',
     backgroundColor: '#ffffff',

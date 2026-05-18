@@ -124,7 +124,7 @@ function ColorField({ label, value, onChange, optional }: { label: string; value
   );
 }
 
-const BUILT_IN_IDS = new Set(['default', 'rmr-1', 'rmr-2', 'rmr-3', 'rmr-4']);
+const BUILT_IN_IDS = new Set(['rmr-1', 'rmr-2', 'rmr-3', 'rmr-4']);
 
 export function StylePanel({
   activeStyle, allStyles, customFont, actorIcon,
