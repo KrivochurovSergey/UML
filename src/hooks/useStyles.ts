@@ -35,13 +35,15 @@ function persistHidden(ids: Set<string>) {
   localStorage.setItem(HIDDEN_KEY, JSON.stringify([...ids]));
 }
 
+const FALLBACK_STYLE = STYLE_PRESETS[0] ?? DEFAULT_STYLE;
+
 function loadActiveStyle(): DiagramStyle {
   try {
     const raw = localStorage.getItem(ACTIVE_STYLE_KEY);
-    if (!raw) return DEFAULT_STYLE;
+    if (!raw) return FALLBACK_STYLE;
     return { ...DEFAULT_STYLE, ...JSON.parse(raw) };
   } catch {
-    return DEFAULT_STYLE;
+    return FALLBACK_STYLE;
   }
 }
 
