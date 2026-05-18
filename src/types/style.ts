@@ -9,6 +9,7 @@ export interface DiagramStyle {
   entityBorderColor: string;
   textColor: string;
   participantTextColor: string;
+  shapeTextColor: string;
   noteColor: string;
   boxColor: string;
   boxTitleColor: string;
@@ -39,6 +40,7 @@ export const DEFAULT_STYLE: DiagramStyle = {
   entityBorderColor: '',
   textColor: '#000000',
   participantTextColor: '',
+  shapeTextColor: '',
   noteColor: '#FFFFCC',
   boxColor: '#DDDDDD',
   boxTitleColor: '#000000',
@@ -131,6 +133,7 @@ export const STYLE_PRESETS: DiagramStyle[] = [
     entityBorderColor: '#06163e',
     textColor: '#06163e',
     participantTextColor: '#ffffff',
+    shapeTextColor: '#06163e',
     noteColor: '#ffffff',
     boxColor: '#06163e',
     boxTitleColor: '#ff0000',

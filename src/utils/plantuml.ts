@@ -27,17 +27,22 @@ function buildSkinparams(style: DiagramStyle): string {
   rawLines.push(color('ArrowColor', style.lineColor));
   if (style.roundCorner != null) rawLines.push(`  RoundCorner ${style.roundCorner}`);
 
-  // Participants / entities
-  const entityTypes = [
-    'Actor', 'Participant', 'Boundary', 'Control',
-    'Entity', 'Database', 'Collections', 'Queue',
-    'Class', 'Component', 'Usecase', 'Node', 'Object',
-  ];
+  // Participants / entities — boxed (rectangular border)
+  const boxedTypes = ['Actor', 'Participant', 'Collections', 'Queue', 'Class', 'Component', 'Usecase', 'Node', 'Object'];
+  // Shapeless (Boundary=circle+line, Control=circle+arrow, Entity=circle, Database=cylinder)
+  const shapeTypes = ['Boundary', 'Control', 'Entity', 'Database'];
   const entityBorder = style.entityBorderColor || style.lineColor;
-  entityTypes.forEach((t) => {
+  const shapeTextColor = style.shapeTextColor || style.participantTextColor;
+
+  boxedTypes.forEach((t) => {
     rawLines.push(color(`${t}BackgroundColor`, style.primaryColor));
     rawLines.push(color(`${t}BorderColor`, entityBorder));
     rawLines.push(color(`${t}FontColor`, style.participantTextColor));
+  });
+  shapeTypes.forEach((t) => {
+    rawLines.push(color(`${t}BackgroundColor`, style.primaryColor));
+    rawLines.push(color(`${t}BorderColor`, entityBorder));
+    rawLines.push(color(`${t}FontColor`, shapeTextColor));
   });
 
   // Notes

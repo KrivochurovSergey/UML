@@ -163,6 +163,7 @@ export function StylePanel({
   };
 
 
+
   const handleFontFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -299,6 +300,7 @@ export function StylePanel({
                 <ColorField label="Рамки сущностей" value={activeStyle.entityBorderColor} onChange={(v) => onUpdate({ entityBorderColor: v })} optional />
                 <ColorField label="Текст" value={activeStyle.textColor} onChange={(v) => onUpdate({ textColor: v })} />
                 <ColorField label="Текст сущностей" value={activeStyle.participantTextColor} onChange={(v) => onUpdate({ participantTextColor: v })} optional />
+                <ColorField label="Текст фигур" value={activeStyle.shapeTextColor} onChange={(v) => onUpdate({ shapeTextColor: v })} optional />
               </div>
             </CollapsibleSection>
 
@@ -481,6 +483,7 @@ export function StylePanel({
                 </div>
               </div>
             </CollapsibleSection>
+
 
 
             {/* Save */}
